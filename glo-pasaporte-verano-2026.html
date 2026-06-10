@@ -552,7 +552,7 @@ Cuenta UNIDADES individuales (cajetillas/packs), no el precio ni el importe.`
         return;
       }
 
-      const text = data.content.map(c => c.text || '').join('');
+      const text = (data.content || []).map(c => c.text || '').join('') || JSON.stringify(data);
       let parsed;
       try {
         const clean = text.replace(/```json|```/g, '').trim();
