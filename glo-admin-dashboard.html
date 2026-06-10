@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GLO Summer Club · Panel Admin 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --gold:#D4A843; --gold-light:#F2C96A; --dark:#0A0A0A; --dark2:#111; --border:rgba(255,255,255,0.07); --text:rgba(255,255,255,0.88); --muted:rgba(255,255,255,0.35); --green:#2E7D32; --coral:#E8522A; --cream:#FAF5E8; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--dark); font-family:'DM Sans',sans-serif; color:var(--text); min-height:100vh; }
+  .topbar { background:var(--dark2); border-bottom:1px solid var(--border); padding:0 28px; display:flex; align-items:center; justify-content:space-between; height:58px; position:sticky; top:0; z-index:100; }
+  .topbar-brand { display:flex; align-items:center; gap:12px; }
+  .topbar-logo { font-family:'Bebas Neue',sans-serif; font-size:20px; color:var(--gold); letter-spacing:3px; }
+  .topbar-sep { width:1px; height:18px; background:var(--border); }
+  .topbar-sub { font-size:11px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; }
+  .topbar-right { display:flex; gap:8px; align-items:center; }
+  .btn { padding:7px 14px; border-radius:4px; font-size:12px; font-family:'DM Sans',sans-serif; font-weight:600; cursor:pointer; transition:all 0.2s; }
+  .btn-outline { background:transparent; border:1px solid var(--border); color:var(--muted); }
+  .btn-outline:hover { border-color:var(--gold); color:var(--gold); }
+  .btn-gold { background:var(--gold); border:none; color:var(--dark); }
+  .btn-gold:hover { background:var(--gold-light); }
+  .live-dot { width:8px; height:8px; border-radius:50%; background:#4CAF50; animation:pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .layout { display:flex; min-height:calc(100vh - 58px); }
+  .sidebar { width:210px; background:var(--dark2); border-right:1px solid var(--border); padding:20px 0; flex-shrink:0; }
+  .sidebar-label { font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); padding:0 20px; margin-bottom:6px; margin-top:16px; }
+  .sidebar-item { display:flex; align-items:center; gap:10px; padding:9px 16px; cursor:pointer; font-size:13px; color:var(--muted); transition:all 0.2s; margin-bottom:1px; }
+  .sidebar-item:hover { background:rgba(255,255,255,0.04); color:var(--text); }
+  .sidebar-item.active { background:rgba(212,168,67,0.1); color:var(--gold); }
+  .sidebar-badge { margin-left:auto; background:var(--gold); color:var(--dark); font-size:10px; font-weight:700; padding:2px 6px; border-radius:10px; min-width:20px; text-align:center; }
+  .main { flex:1; padding:28px; overflow-x:auto; }
+  .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px; }
+  .stat-card { background:var(--dark2); border:1px solid var(--border); border-radius:6px; padding:18px; }
+  .stat-label { font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+  .stat-value { font-family:'Bebas Neue',sans-serif; font-size:40px; line-height:1; color:var(--gold); margin-bottom:2px; }
+  .stat-sub { font-size:11px; color:var(--muted); }
+  .stat-card.green .stat-value { color:#4CAF50; }
+  .stat-card.coral .stat-value { color:var(--coral); }
+  .stat-card.teal .stat-value { color:#4DB6AC; }
+  .stage-bars { background:var(--dark2); border:1px solid var(--border); border-radius:6px; padding:18px 22px; margin-bottom:24px; display:flex; gap:28px; align-items:center; }
+  .stage-bars-title { font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); white-space:nowrap; }
+  .stage-bar-item { flex:1; display:flex; flex-direction:column; gap:5px; }
+  .stage-bar-label { display:flex; justify-content:space-between; font-size:11px; color:var(--muted); }
+  .stage-bar-label span:last-child { color:var(--gold); font-weight:600; }
+  .bar-track { height:4px; background:rgba(255,255,255,0.06); border-radius:2px; overflow:hidden; }
+  .bar-fill { height:100%; background:linear-gradient(90deg,var(--gold),var(--gold-light)); border-radius:2px; transition:width 0.6s ease; }
+  .table-wrap { background:var(--dark2); border:1px solid var(--border); border-radius:6px; overflow:hidden; }
+  .table-header { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--border); }
+  .table-title { font-family:'Bebas Neue',sans-serif; font-size:17px; letter-spacing:1px; }
+  .table-controls { display:flex; gap:8px; }
+  .search-input { background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:4px; padding:6px 12px; font-size:12px; color:var(--text); font-family:'DM Sans',sans-serif; outline:none; width:200px; }
+  .search-input::placeholder { color:var(--muted); }
+  .search-input:focus { border-color:var(--gold); }
+  .filter-select { background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:4px; padding:6px 10px; font-size:12px; color:var(--text); font-family:'DM Sans',sans-serif; outline:none; cursor:pointer; }
+  .filter-select option { background:#1a1a1a; }
+  table { width:100%; border-collapse:collapse; }
+  thead th { padding:9px 14px; text-align:left; font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); border-bottom:1px solid var(--border); font-weight:600; white-space:nowrap; }
+  tbody tr { border-bottom:1px solid rgba(255,255,255,0.03); transition:background 0.15s; cursor:pointer; }
+  tbody tr:hover { background:rgba(255,255,255,0.025); }
+  tbody tr:last-child { border-bottom:none; }
+  td { padding:11px 14px; font-size:13px; vertical-align:middle; }
+  .user-cell { display:flex; align-items:center; gap:10px; }
+  .avatar { width:32px; height:32px; border-radius:50%; background:var(--gold); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px; color:var(--dark); flex-shrink:0; }
+  .td-name { font-weight:600; }
+  .td-email { font-size:11px; color:var(--muted); }
+  .stage-pills { display:flex; gap:3px; }
+  .pill { width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; border:1px solid rgba(255,255,255,0.1); color:var(--muted); }
+  .pill.done { background:rgba(46,125,50,0.2); border-color:var(--green); color:#4CAF50; }
+  .prog-badge { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:20px; font-size:11px; font-weight:600; }
+  .p0 { background:rgba(255,255,255,0.05); color:var(--muted); }
+  .p1 { background:rgba(212,168,67,0.1); color:var(--gold); }
+  .p2 { background:rgba(232,82,42,0.1); color:#FF7043; }
+  .p3 { background:rgba(26,107,107,0.2); color:#4DB6AC; }
+  .p4 { background:rgba(46,125,50,0.15); color:#4CAF50; }
+  .tickets-cell { display:flex; gap:4px; }
+  .ticket-thumb { width:28px; height:28px; border-radius:3px; object-fit:cover; border:1px solid rgba(255,255,255,0.1); cursor:zoom-in; transition:transform 0.15s; }
+  .ticket-thumb:hover { transform:scale(1.15); }
+  .ticket-missing { width:28px; height:28px; border-radius:3px; background:rgba(255,255,255,0.04); border:1px dashed rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; font-size:9px; color:var(--muted); }
+  .empty-state { text-align:center; padding:70px 32px; color:var(--muted); }
+  .empty-icon { font-size:44px; margin-bottom:14px; opacity:0.35; }
+  .empty-title { font-family:'Bebas Neue',sans-serif; font-size:22px; margin-bottom:6px; color:rgba(255,255,255,0.15); }
+  .empty-sub { font-size:13px; line-height:1.6; }
+  .detail-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:200; }
+  .detail-overlay.open { display:block; }
+  .detail-panel { position:fixed; top:0; right:0; bottom:0; width:420px; background:var(--dark2); border-left:1px solid var(--border); z-index:201; overflow-y:auto; transform:translateX(100%); transition:transform 0.3s ease; box-shadow:-20px 0 60px rgba(0,0,0,0.6); }
+  .detail-panel.open { transform:translateX(0); }
+  .detail-top { background:linear-gradient(135deg,#0A2A2A,#1A0A05); padding:24px 20px 20px; border-bottom:2px solid var(--gold); position:relative; }
+  .detail-close { position:absolute; top:14px; right:14px; background:rgba(255,255,255,0.08); border:none; color:var(--muted); width:28px; height:28px; border-radius:50%; cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center; }
+  .detail-close:hover { color:white; background:rgba(255,255,255,0.15); }
+  .detail-avatar { width:48px; height:48px; border-radius:50%; background:var(--gold); display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:20px; color:var(--dark); margin-bottom:10px; }
+  .detail-name { font-family:'Bebas Neue',sans-serif; font-size:22px; color:white; margin-bottom:2px; }
+  .detail-email-sub { font-size:12px; color:rgba(255,255,255,0.35); }
+  .detail-body { padding:18px; }
+  .d-section { font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:10px; margin-top:20px; }
+  .d-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .d-field { background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:4px; padding:9px 11px; }
+  .d-field.full { grid-column:1/-1; }
+  .d-field-label { font-size:9px; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-bottom:3px; }
+  .d-field-value { font-size:13px; color:var(--text); font-weight:500; word-break:break-word; }
+  .d-stages { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .d-stage { padding:10px; border-radius:4px; border:1px solid var(--border); background:rgba(255,255,255,0.02); }
+  .d-stage.done { border-color:rgba(46,125,50,0.4); background:rgba(46,125,50,0.06); }
+  .d-stage-icon { font-size:18px; margin-bottom:3px; }
+  .d-stage-name { font-size:11px; color:var(--muted); }
+  .d-stage.done .d-stage-name { color:#4CAF50; }
+  .d-stage-status { font-size:10px; margin-top:3px; color:var(--muted); }
+  .d-stage.done .d-stage-status { color:#4CAF50; }
+  .tickets-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
+  .ticket-card { border:1px solid var(--border); border-radius:6px; overflow:hidden; background:rgba(255,255,255,0.02); }
+  .ticket-card.has-img { border-color:rgba(46,125,50,0.4); }
+  .ticket-card-img { width:100%; height:110px; object-fit:cover; display:block; cursor:zoom-in; }
+  .ticket-card-label { padding:6px 8px; font-size:10px; color:var(--muted); }
+  .ticket-card.has-img .ticket-card-label { color:#4CAF50; }
+  .ticket-card-empty { width:100%; height:110px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; opacity:0.3; }
+  .ticket-card-empty span { font-size:24px; }
+  .ticket-card-empty p { font-size:10px; color:var(--muted); }
+  .lightbox { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:500; align-items:center; justify-content:center; }
+  .lightbox.open { display:flex; }
+  .lightbox img { max-width:90vw; max-height:88vh; border-radius:6px; object-fit:contain; }
+  .lightbox-close { position:fixed; top:20px; right:24px; background:rgba(255,255,255,0.1); border:none; color:white; font-size:22px; width:40px; height:40px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  @media (max-width:900px) { .stats-grid { grid-template-columns:repeat(2,1fr); } .sidebar { display:none; } .detail-panel { width:100%; } }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-logo">GLO ☀️</div>
+    <div class="topbar-sep"></div>
+    <div class="topbar-sub">Panel Admin · Summer Club 2026</div>
+  </div>
+  <div class="topbar-right">
+    <div class="live-dot" title="En vivo"></div>
+    <button class="btn btn-outline" onclick="loadData()">↺ Actualizar</button>
+    <button class="btn btn-gold" onclick="exportCSV()">⬇ Exportar CSV</button>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-label">General</div>
+    <div class="sidebar-item active" onclick="showAll(this)"><span>📋</span> Todos<span class="sidebar-badge" id="sb-total">0</span></div>
+    <div class="sidebar-item" onclick="filterStage(4,this)"><span>🏆</span> Completos<span class="sidebar-badge" id="sb-complete">0</span></div>
+    <div class="sidebar-label">Por etapa</div>
+    <div class="sidebar-item" onclick="filterStage(1,this)"><span>✍️</span> Etapa 1<span class="sidebar-badge" id="sb-s1">0</span></div>
+    <div class="sidebar-item" onclick="filterStage(2,this)"><span>👜</span> Etapa 2<span class="sidebar-badge" id="sb-s2">0</span></div>
+    <div class="sidebar-item" onclick="filterStage(3,this)"><span>🕶️</span> Etapa 3<span class="sidebar-badge" id="sb-s3">0</span></div>
+    <div class="sidebar-item" onclick="filterStage(4,this)"><span>🩴</span> Etapa 4<span class="sidebar-badge" id="sb-s4">0</span></div>
+    <div class="sidebar-label">Acciones</div>
+    <div class="sidebar-item" onclick="exportCSV()"><span>📊</span> Exportar CSV</div>
+  </div>
+
+  <div class="main">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Total registros</div><div class="stat-value" id="stat-total">0</div><div class="stat-sub">usuarios</div></div>
+      <div class="stat-card green"><div class="stat-label">Completos</div><div class="stat-value" id="stat-complete">0</div><div class="stat-sub">las 4 etapas</div></div>
+      <div class="stat-card coral"><div class="stat-label">Etapa media</div><div class="stat-value" id="stat-avg">—</div><div class="stat-sub">progreso promedio</div></div>
+      <div class="stat-card teal"><div class="stat-label">Conversión</div><div class="stat-value" id="stat-conv">0%</div><div class="stat-sub">completos / total</div></div>
+    </div>
+    <div class="stage-bars">
+      <div class="stage-bars-title">Por<br>etapa</div>
+      <div class="stage-bar-item"><div class="stage-bar-label"><span>✍️ E1</span><span id="pct1">0%</span></div><div class="bar-track"><div class="bar-fill" id="bar1" style="width:0%"></div></div></div>
+      <div class="stage-bar-item"><div class="stage-bar-label"><span>👜 E2</span><span id="pct2">0%</span></div><div class="bar-track"><div class="bar-fill" id="bar2" style="width:0%"></div></div></div>
+      <div class="stage-bar-item"><div class="stage-bar-label"><span>🕶️ E3</span><span id="pct3">0%</span></div><div class="bar-track"><div class="bar-fill" id="bar3" style="width:0%"></div></div></div>
+      <div class="stage-bar-item"><div class="stage-bar-label"><span>🩴 E4</span><span id="pct4">0%</span></div><div class="bar-track"><div class="bar-fill" id="bar4" style="width:0%"></div></div></div>
+    </div>
+    <div class="table-wrap">
+      <div class="table-header">
+        <div class="table-title">REGISTROS EN TIEMPO REAL</div>
+        <div class="table-controls">
+          <input class="search-input" type="text" placeholder="🔍 Buscar nombre o email..." oninput="filterText(this.value)">
+          <select class="filter-select" id="pais-filter" onchange="filterPais(this.value)"><option value="">Todos los países</option></select>
+        </div>
+      </div>
+      <div id="table-container"></div>
+    </div>
+  </div>
+</div>
+
+<div class="detail-overlay" id="detail-overlay" onclick="closeDetail()"></div>
+<div class="detail-panel" id="detail-panel">
+  <div class="detail-top">
+    <button class="detail-close" onclick="closeDetail()">✕</button>
+    <div class="detail-avatar" id="d-avatar">?</div>
+    <div class="detail-name" id="d-name">—</div>
+    <div class="detail-email-sub" id="d-email">—</div>
+  </div>
+  <div class="detail-body" id="d-body"></div>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img id="lightbox-img" src="" alt="Ticket">
+</div>
+
+<script>
+  const SUPA_URL = 'https://qrnyvsulckvewabkzjsq.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFybnl2c3VsY2t2ZXdhYmt6anNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MDk3OTYsImV4cCI6MjA5NTk4NTc5Nn0.UxNW8-NmTdmTMSnd2jIKP--F9JMARs4DOJabt2jM1F4';
+
+  let allData = [];
+  let filterQ = '';
+  let filterP = '';
+  let filterS = null;
+
+  async function loadData() {
+    try {
+      const res = await fetch(`${SUPA_URL}/rest/v1/registros?select=*&order=created_at.desc`, {
+        headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}` }
+      });
+      allData = await res.json();
+      render();
+    } catch(e) { console.error('Error cargando datos:', e); }
+  }
+
+  function render() {
+    updateStats();
+    updateSidebar();
+    updatePaisFilter();
+    renderTable(filtered());
+  }
+
+  function filtered() {
+    return allData.filter(r => {
+      const q = filterQ.toLowerCase();
+      const ok1 = !q || (r.nombre||'').toLowerCase().includes(q) || (r.email||'').toLowerCase().includes(q);
+      const ok2 = !filterP || r.pais === filterP;
+      const ok3 = !filterS || r.etapas_completadas >= filterS;
+      return ok1 && ok2 && ok3;
+    });
+  }
+
+  function updateStats() {
+    const total = allData.length;
+    const complete = allData.filter(r => r.etapas_completadas === 4).length;
+    const avg = total ? (allData.reduce((a,r) => a + (r.etapas_completadas||0), 0) / total).toFixed(1) : '—';
+    const conv = total ? Math.round(complete / total * 100) : 0;
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-complete').textContent = complete;
+    document.getElementById('stat-avg').textContent = avg;
+    document.getElementById('stat-conv').textContent = conv + '%';
+    [1,2,3,4].forEach(i => {
+      const n = allData.filter(r => r.etapas_completadas >= i).length;
+      const pct = total ? Math.round(n / total * 100) : 0;
+      document.getElementById('bar'+i).style.width = pct + '%';
+      document.getElementById('pct'+i).textContent = pct + '%';
+    });
+  }
+
+  function updateSidebar() {
+    document.getElementById('sb-total').textContent = allData.length;
+    document.getElementById('sb-complete').textContent = allData.filter(r => r.etapas_completadas === 4).length;
+    [1,2,3,4].forEach(i => document.getElementById('sb-s'+i).textContent = allData.filter(r => r.etapas_completadas >= i).length);
+  }
+
+  function updatePaisFilter() {
+    const paises = [...new Set(allData.map(r => r.pais).filter(Boolean))].sort();
+    const sel = document.getElementById('pais-filter');
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">Todos los países</option>';
+    paises.forEach(p => { const o = document.createElement('option'); o.value=p; o.textContent=p; if(p===cur) o.selected=true; sel.appendChild(o); });
+  }
+
+  function renderTable(data) {
+    const c = document.getElementById('table-container');
+    if (!data.length) {
+      c.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">Sin registros aún</div><div class="empty-sub">Los datos aparecerán aquí en tiempo real cuando los usuarios completen etapas del pasaporte.</div></div>`;
+      return;
+    }
+    const rows = data.map(r => {
+      const initials = (r.nombre||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      const pills = [1,2,3,4].map(i=>`<div class="pill${r.etapas_completadas>=i?' done':''}">${r.etapas_completadas>=i?'✓':i}</div>`).join('');
+      const prog = `<span class="prog-badge p${r.etapas_completadas||0}">${r.etapas_completadas===4?'🏆 Completo':'Etapa '+(r.etapas_completadas||0)+'/4'}</span>`;
+      const date = new Date(r.created_at).toLocaleDateString('es-ES',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+      const thumbs = [1,2,3,4].map(i => {
+        const img = r['ticket'+i+'_img'];
+        if (img) return `<img class="ticket-thumb" src="${img}" title="Ticket E${i}" onclick="event.stopPropagation();openLightbox('${img}')">`;
+        return `<div class="ticket-missing">E${i}</div>`;
+      }).join('');
+      const idx = allData.indexOf(r);
+      return `<tr onclick="showDetail(${idx})">
+        <td><div class="user-cell"><div class="avatar">${initials}</div><div><div class="td-name">${r.nombre||'—'}</div><div class="td-email">${r.email||'—'}</div></div></div></td>
+        <td style="font-size:12px">${r.pais||'—'}</td>
+        <td><div class="stage-pills">${pills}</div></td>
+        <td>${prog}</td>
+        <td><div class="tickets-cell">${thumbs}</div></td>
+        <td style="font-size:11px;color:var(--muted)">${date}</td>
+      </tr>`;
+    }).join('');
+    c.innerHTML = `<table><thead><tr><th>Usuario</th><th>País</th><th>Etapas</th><th>Progreso</th><th>Tickets</th><th>Fecha</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+
+  function filterText(q) { filterQ=q; renderTable(filtered()); }
+  function filterPais(p) { filterP=p; renderTable(filtered()); }
+  function filterStage(s,el) { filterS=s; document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active')); el.classList.add('active'); renderTable(filtered()); }
+  function showAll(el) { filterS=null; filterQ=''; filterP=''; document.getElementById('pais-filter').value=''; document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active')); el.classList.add('active'); render(); }
+
+  function showDetail(idx) {
+    const r = allData[idx];
+    if (!r) return;
+    const initials = (r.nombre||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    document.getElementById('d-avatar').textContent = initials;
+    document.getElementById('d-name').textContent = r.nombre||'—';
+    document.getElementById('d-email').textContent = r.email||'—';
+
+    const stages = [{n:1,icon:'✍️',label:'Registro'},{n:2,icon:'👜',label:'Perfil'},{n:3,icon:'🕶️',label:'Encuesta'},{n:4,icon:'🩴',label:'Experiencia'}];
+    let html = `<div class="d-section">Etapas</div><div class="d-stages">`;
+    stages.forEach(s => {
+      const done = r.etapas_completadas >= s.n;
+      html += `<div class="d-stage${done?' done':''}"><div class="d-stage-icon">${s.icon}</div><div class="d-stage-name">${s.label}</div><div class="d-stage-status">${done?'✓ Completado':'— Pendiente'}</div></div>`;
+    });
+    html += `</div>`;
+
+    html += `<div class="d-section">📸 Tickets</div><div class="tickets-grid">`;
+    [1,2,3,4].forEach(i => {
+      const img = r['ticket'+i+'_img'];
+      if (img) html += `<div class="ticket-card has-img"><img class="ticket-card-img" src="${img}" onclick="openLightbox('${img}')"><div class="ticket-card-label">✅ Etapa ${i}</div></div>`;
+      else html += `<div class="ticket-card"><div class="ticket-card-empty"><span>🧾</span><p>Etapa ${i}</p></div><div class="ticket-card-label">— Pendiente</div></div>`;
+    });
+    html += `</div>`;
+
+    html += `<div class="d-section">Datos personales</div><div class="d-grid">`;
+    [{l:'Nombre',v:r.nombre},{l:'Email',v:r.email},{l:'País',v:r.pais},{l:'Fecha nac.',v:r.fecha_nacimiento},{l:'Teléfono',v:r.telefono},{l:'Ciudad',v:r.ciudad},{l:'Cómo nos conoció',v:r.como_conocio}].forEach(({l,v}) => {
+      if (!v) return;
+      html += `<div class="d-field"><div class="d-field-label">${l}</div><div class="d-field-value">${v}</div></div>`;
+    });
+    html += `</div>`;
+
+    if (r.etapas_completadas >= 3) {
+      html += `<div class="d-section">Encuesta</div><div class="d-grid">`;
+      [{l:'Frecuencia',v:r.frecuencia},{l:'Valoración',v:r.valoracion?'⭐'.repeat(r.valoracion):null},{l:'Verano',v:r.verano},{l:'Comentario',v:r.comentario}].forEach(({l,v}) => {
+        if (!v) return;
+        const full = l==='Comentario';
+        html += `<div class="d-field${full?' full':''}"><div class="d-field-label">${l}</div><div class="d-field-value">${v}</div></div>`;
+      });
+      html += `</div>`;
+    }
+
+    if (r.etapas_completadas >= 4) {
+      html += `<div class="d-section">Experiencia</div><div class="d-grid">`;
+      [{l:'Código',v:r.codigo_evento},{l:'Tipo',v:r.tipo_experiencia},{l:'Relato',v:r.relato}].forEach(({l,v}) => {
+        if (!v) return;
+        const full = l==='Relato';
+        html += `<div class="d-field${full?' full':''}"><div class="d-field-label">${l}</div><div class="d-field-value">${v}</div></div>`;
+      });
+      html += `</div>`;
+    }
+
+    html += `<div class="d-section">Info</div><div class="d-grid"><div class="d-field full"><div class="d-field-label">Fecha registro</div><div class="d-field-value">${new Date(r.created_at).toLocaleString('es-ES')}</div></div></div>`;
+
+    document.getElementById('d-body').innerHTML = html;
+    document.getElementById('detail-overlay').classList.add('open');
+    document.getElementById('detail-panel').classList.add('open');
+  }
+
+  function closeDetail() { document.getElementById('detail-overlay').classList.remove('open'); document.getElementById('detail-panel').classList.remove('open'); }
+  function openLightbox(src) { document.getElementById('lightbox-img').src=src; document.getElementById('lightbox').classList.add('open'); }
+  function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
+
+  function exportCSV() {
+    if (!allData.length) { alert('No hay datos.'); return; }
+    const h = ['Nombre','Email','País','Fecha nac.','Teléfono','Ciudad','Cómo conoció','Frecuencia','Valoración','Verano','Comentario','Código evento','Experiencia','Relato','Ticket1','Ticket2','Ticket3','Ticket4','Etapas','Fecha'];
+    const rows = allData.map(r => [r.nombre,r.email,r.pais,r.fecha_nacimiento,r.telefono,r.ciudad,r.como_conocio,r.frecuencia,r.valoracion,r.verano,r.comentario,r.codigo_evento,r.tipo_experiencia,r.relato,r.ticket1_nombre?'✓':'',r.ticket2_nombre?'✓':'',r.ticket3_nombre?'✓':'',r.ticket4_nombre?'✓':'',r.etapas_completadas,new Date(r.created_at).toLocaleString('es-ES')].map(v=>`"${String(v||'').replace(/"/g,'""')}"`));
+    const csv = [h.join(','),...rows.map(r=>r.join(','))].join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
+    a.download = `glo-summer-club-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+  }
+
+  // Auto-refresh cada 30 segundos
+  loadData();
+  setInterval(loadData, 30000);
+</script>
+</body>
+</html>

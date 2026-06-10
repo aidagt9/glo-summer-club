@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pasaporte de Verano GLO 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #D4A843;
+    --gold-light: #F2C96A;
+    --dark: #0A0A0A;
+    --dark2: #111;
+    --cream: #FAF5E8;
+    --coral: #E8522A;
+    --green: #2E7D32;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--dark);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0;
+    background-image:
+      radial-gradient(ellipse at 10% 20%, rgba(212,168,67,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 90% 80%, rgba(232,82,42,0.06) 0%, transparent 50%);
+  }
+
+  /* ── LOGIN SCREEN ── */
+  .login-screen {
+    position: fixed; inset: 0;
+    background: linear-gradient(160deg, #0A2A2A 0%, #0D1A0D 50%, #1A0A05 100%);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 2000; padding: 32px;
+  }
+  .login-screen.hidden { display: none; }
+
+  .login-sun {
+    width: 64px; height: 64px;
+    border: 2px solid var(--gold); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px; font-size: 26px;
+    background: rgba(212,168,67,0.08);
+  }
+  .login-brand { font-family: 'Bebas Neue', sans-serif; font-size: 11px; letter-spacing: 6px; color: var(--gold); margin-bottom: 6px; text-align: center; }
+  .login-title { font-family: 'Bebas Neue', sans-serif; font-size: 44px; line-height: 0.9; color: var(--cream); text-align: center; margin-bottom: 4px; }
+  .login-year { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--gold); letter-spacing: 8px; text-align: center; margin-bottom: 32px; }
+
+  .login-box {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(212,168,67,0.2);
+    border-radius: 8px; padding: 28px 24px;
+    width: 100%; max-width: 380px;
+  }
+  .login-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 8px; display: block; }
+  .login-input {
+    width: 100%; background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15); border-radius: 4px;
+    padding: 12px 14px; font-size: 15px; color: white;
+    font-family: 'DM Sans', sans-serif; outline: none; margin-bottom: 14px;
+  }
+  .login-input:focus { border-color: var(--gold); }
+  .login-input::placeholder { color: rgba(255,255,255,0.25); }
+  .login-btn {
+    width: 100%; padding: 14px;
+    background: var(--gold); color: var(--dark);
+    border: none; border-radius: 4px;
+    font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 3px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .login-btn:hover { background: var(--gold-light); }
+  .login-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .login-error { color: var(--coral); font-size: 12px; margin-bottom: 10px; display: none; }
+  .login-msg { font-size: 11px; color: rgba(255,255,255,0.3); text-align: center; margin-top: 12px; line-height: 1.6; }
+
+  /* ── PASSPORT ── */
+  .passport {
+    width: 100%; max-width: 480px;
+    background: var(--cream);
+    border-radius: 4px; overflow: hidden;
+    box-shadow: 0 40px 120px rgba(0,0,0,0.8), 0 0 0 1px rgba(212,168,67,0.3);
+    margin: 20px auto;
+  }
+
+  .cover {
+    background: linear-gradient(160deg, #0A2A2A 0%, #0D1A0D 50%, #1A0A05 100%);
+    padding: 48px 36px 40px; text-align: center;
+    position: relative; overflow: hidden;
+    border-bottom: 3px solid var(--gold);
+  }
+  .cover::after {
+    content: ''; position: absolute;
+    top: -60px; left: -60px; right: -60px; bottom: -60px;
+    background: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(212,168,67,0.03) 20px, rgba(212,168,67,0.03) 21px);
+    pointer-events: none;
+  }
+  .cover-sun {
+    width: 72px; height: 72px; border: 2px solid var(--gold); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px; font-size: 28px; position: relative; z-index: 2;
+    background: rgba(212,168,67,0.08);
+  }
+  .cover-brand { font-family: 'Bebas Neue', sans-serif; font-size: 11px; letter-spacing: 6px; color: var(--gold); margin-bottom: 8px; position: relative; z-index: 2; }
+  .cover-title { font-family: 'Bebas Neue', sans-serif; font-size: 52px; line-height: 0.9; color: var(--cream); position: relative; z-index: 2; margin-bottom: 4px; }
+  .cover-year { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--gold); letter-spacing: 8px; position: relative; z-index: 2; }
+  .cover-tagline { margin-top: 20px; font-size: 11px; color: rgba(250,245,232,0.4); letter-spacing: 2px; text-transform: uppercase; position: relative; z-index: 2; font-weight: 300; }
+
+  /* ── UPLOAD SECTION ── */
+  .upload-section { padding: 28px 24px 32px; }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px;
+    color: #1a1a1a; margin-bottom: 6px;
+  }
+  .section-sub { font-size: 13px; color: rgba(0,0,0,0.45); margin-bottom: 24px; line-height: 1.5; }
+
+  .ticket-upload-label {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 8px;
+    width: 100%; min-height: 140px;
+    border: 2px dashed rgba(212,168,67,0.45); border-radius: 8px;
+    padding: 28px 16px; text-align: center;
+    cursor: pointer; transition: all 0.25s;
+    background: rgba(212,168,67,0.02); margin-bottom: 8px;
+  }
+  .ticket-upload-label:hover { border-color: var(--gold); background: rgba(212,168,67,0.05); }
+  .ticket-upload-label.has-file { border-style: solid; border-color: var(--green); background: rgba(46,125,50,0.04); }
+  .ticket-upload-label input[type=file] { display: none; }
+  .t-icon { font-size: 32px; }
+  .t-main { font-size: 13px; font-weight: 700; color: rgba(0,0,0,0.5); }
+  .ticket-upload-label.has-file .t-main { color: var(--green); }
+  .t-sub { font-size: 10px; color: rgba(0,0,0,0.3); }
+  .ticket-upload-label.has-file .t-sub { color: var(--green); }
+
+  .ticket-preview-img {
+    display: none; width: 100%; max-height: 160px;
+    object-fit: cover; border-radius: 6px; margin-top: 10px;
+    border: 2px solid rgba(46,125,50,0.3);
+  }
+
+  .btn-analizar {
+    width: 100%; margin-top: 16px; padding: 16px;
+    background: var(--dark); color: var(--gold); border: none;
+    border-radius: 4px; font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px; letter-spacing: 3px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-analizar:hover { background: var(--gold); color: var(--dark); }
+  .btn-analizar:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* ── ANALYZING STATE ── */
+  .analyzing-overlay {
+    display: none; text-align: center; padding: 32px 20px;
+  }
+  .analyzing-overlay.show { display: block; }
+  .analyzing-spinner {
+    width: 48px; height: 48px; border: 3px solid rgba(212,168,67,0.2);
+    border-top-color: var(--gold); border-radius: 50%;
+    animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .analyzing-text { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: #1a1a1a; margin-bottom: 6px; }
+  .analyzing-sub { font-size: 12px; color: rgba(0,0,0,0.4); }
+
+  /* ── ERROR STATE ── */
+  .error-box {
+    display: none; background: rgba(232,82,42,0.08);
+    border: 1px solid rgba(232,82,42,0.3); border-radius: 6px;
+    padding: 14px 16px; margin-top: 14px;
+    font-size: 13px; color: var(--coral); line-height: 1.5;
+  }
+  .error-box.show { display: block; }
+
+  /* ── RESULT ── */
+  .result-section { display: none; padding: 28px 24px 32px; }
+  .result-section.show { display: block; }
+
+  .quantity-badge {
+    text-align: center; padding: 24px;
+    background: linear-gradient(135deg, #0A2A2A, #1A0A05);
+    border-radius: 8px; margin-bottom: 20px;
+    border: 2px solid var(--gold);
+  }
+  .quantity-num { font-family: 'Bebas Neue', sans-serif; font-size: 72px; color: var(--gold); line-height: 1; }
+  .quantity-label { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-top: 4px; }
+  .quantity-product { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 8px; }
+
+  /* Prize cards */
+  .prizes-unlocked { margin-bottom: 20px; }
+  .prizes-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 1px; color: #1a1a1a; margin-bottom: 12px; }
+
+  .prize-card {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px; border-radius: 6px; margin-bottom: 8px;
+    border: 1px solid rgba(0,0,0,0.08); background: white;
+  }
+  .prize-card.unlocked { border-color: var(--green); background: rgba(46,125,50,0.04); }
+  .prize-card.locked { opacity: 0.4; }
+  .prize-card.selected-prize { border-color: var(--gold); background: rgba(212,168,67,0.08); box-shadow: 0 2px 12px rgba(212,168,67,0.2); }
+
+  .prize-icon { font-size: 28px; flex-shrink: 0; }
+  .prize-info { flex: 1; }
+  .prize-name { font-size: 14px; font-weight: 700; color: #1a1a1a; margin-bottom: 2px; }
+  .prize-req { font-size: 11px; color: rgba(0,0,0,0.4); }
+  .prize-card.unlocked .prize-req { color: var(--green); font-weight: 600; }
+  .prize-status { font-size: 18px; flex-shrink: 0; }
+
+  /* Choice for 5+ */
+  .choice-section { display: none; margin-bottom: 20px; }
+  .choice-section.show { display: block; }
+  .choice-title { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 1px; color: #1a1a1a; margin-bottom: 10px; }
+
+  .choice-btn {
+    width: 100%; padding: 13px 16px; margin-bottom: 8px;
+    border: 2px solid rgba(0,0,0,0.08); border-radius: 6px;
+    background: white; font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 600; color: #333;
+    cursor: pointer; transition: all 0.2s; text-align: left;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .choice-btn:hover { border-color: var(--gold); background: rgba(212,168,67,0.04); }
+  .choice-btn.chosen { border-color: var(--gold); background: rgba(212,168,67,0.08); color: #8B6914; }
+
+  .btn-confirm {
+    width: 100%; padding: 16px; background: var(--dark); color: var(--gold);
+    border: none; border-radius: 4px;
+    font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 3px;
+    cursor: pointer; transition: all 0.2s; margin-top: 8px;
+  }
+  .btn-confirm:hover { background: var(--gold); color: var(--dark); }
+  .btn-confirm:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* Analysis detail */
+  .analysis-detail {
+    background: rgba(0,0,0,0.03); border-radius: 6px;
+    padding: 14px 16px; margin-bottom: 16px;
+    font-size: 12px; color: rgba(0,0,0,0.45); line-height: 1.6;
+    border-left: 3px solid var(--gold);
+  }
+
+  /* ── FOOTER ── */
+  .passport-footer { background: var(--dark); padding: 20px 24px; border-top: 3px solid var(--gold); }
+  .footer-line { font-size: 9px; letter-spacing: 2px; color: rgba(255,255,255,0.15); font-family: 'Courier New', monospace; margin-bottom: 2px; }
+  .footer-note { margin-top: 10px; font-size: 10px; color: rgba(255,255,255,0.2); line-height: 1.6; }
+
+  /* ── CONFETTI ── */
+  @keyframes fall { 0% { transform: translateY(-20px) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+  .confetti-piece { position: fixed; width: 8px; height: 8px; border-radius: 1px; pointer-events: none; z-index: 9999; animation: fall linear forwards; }
+
+  /* ── MODAL ── */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 1000; align-items: center; justify-content: center; padding: 24px; }
+  .modal-overlay.show { display: flex; }
+  .modal { background: var(--cream); border-radius: 8px; padding: 40px 28px; text-align: center; max-width: 340px; width: 100%; box-shadow: 0 20px 80px rgba(0,0,0,0.5); border-top: 4px solid var(--gold); animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .modal-icon { font-size: 56px; margin-bottom: 16px; }
+  .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--dark); margin-bottom: 8px; }
+  .modal-body { font-size: 14px; color: rgba(0,0,0,0.5); margin-bottom: 24px; line-height: 1.6; }
+  .modal-body strong { color: var(--gold); font-size: 16px; }
+  .modal-close { padding: 12px 32px; background: var(--dark); color: var(--gold); border: none; border-radius: 4px; font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 2px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="login-screen">
+  <div class="login-sun">☀️</div>
+  <div class="login-brand">GLO Summer Club</div>
+  <div class="login-title">PASAPORTE<br>DE VERANO</div>
+  <div class="login-year">2 0 2 6</div>
+  <div class="login-box">
+    <div class="login-error" id="login-error">Introduce un email válido.</div>
+    <label class="login-label">Tu correo electrónico</label>
+    <input class="login-input" type="email" id="login-email" placeholder="correo@ejemplo.com"
+      onkeydown="if(event.key==='Enter') doLogin()">
+    <button class="login-btn" id="login-btn" onclick="doLogin()">ACCEDER</button>
+    <div class="login-msg">Solo necesitas tu email y la foto de tu ticket de compra GLO.</div>
+  </div>
+</div>
+
+<!-- PASSPORT -->
+<div class="passport" id="passport" style="display:none">
+
+  <div class="cover">
+    <div class="cover-sun">☀️</div>
+    <div class="cover-brand">GLO Summer Club</div>
+    <div class="cover-title">PASAPORTE<br>DE VERANO</div>
+    <div class="cover-year">2 0 2 6</div>
+    <div class="cover-tagline">Sube tu ticket · Desbloquea tu regalo</div>
+  </div>
+
+  <!-- UPLOAD -->
+  <div class="upload-section" id="upload-section">
+    <div class="section-title">SUBE TU TICKET DE COMPRA</div>
+    <div class="section-sub">Haz una foto clara de tu ticket de compra GLO. Nuestra IA detectará automáticamente la cantidad de productos y desbloqueará tu regalo.</div>
+
+    <label class="ticket-upload-label" id="ticket-label">
+      <input type="file" accept="image/*" onchange="handleTicketUpload(this)">
+      <span class="t-icon" id="t-icon">🧾</span>
+      <span class="t-main" id="t-main">Toca para subir foto del ticket</span>
+      <span class="t-sub" id="t-sub">JPG, PNG o HEIC · foto clara del ticket</span>
+      <img class="ticket-preview-img" id="ticket-preview" alt="Ticket">
+    </label>
+
+    <div class="error-box" id="error-box"></div>
+
+    <button class="btn-analizar" id="btn-analizar" onclick="analyzeTicket()" disabled>
+      ANALIZAR TICKET
+    </button>
+
+    <!-- Analyzing state -->
+    <div class="analyzing-overlay" id="analyzing-overlay">
+      <div class="analyzing-spinner"></div>
+      <div class="analyzing-text">ANALIZANDO TU TICKET</div>
+      <div class="analyzing-sub">La IA está leyendo tu compra...</div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="result-section" id="result-section">
+
+    <div class="quantity-badge">
+      <div class="quantity-num" id="qty-num">0</div>
+      <div class="quantity-label">Unidades GLO detectadas</div>
+      <div class="quantity-product" id="qty-product"></div>
+    </div>
+
+    <div class="analysis-detail" id="analysis-detail"></div>
+
+    <div class="prizes-unlocked">
+      <div class="prizes-title">TU COLECCIÓN SUMMER ESSENTIALS</div>
+
+      <div class="prize-card" id="prize-1">
+        <div class="prize-icon">✍️</div>
+        <div class="prize-info">
+          <div class="prize-name">Bolígrafo GLO</div>
+          <div class="prize-req">Requiere 2 unidades</div>
+        </div>
+        <div class="prize-status" id="prize-status-1">🔒</div>
+      </div>
+
+      <div class="prize-card" id="prize-2">
+        <div class="prize-icon">👜</div>
+        <div class="prize-info">
+          <div class="prize-name">Tote Bag GLO</div>
+          <div class="prize-req">Requiere 3 unidades</div>
+        </div>
+        <div class="prize-status" id="prize-status-2">🔒</div>
+      </div>
+
+      <div class="prize-card" id="prize-3">
+        <div class="prize-icon">🕶️</div>
+        <div class="prize-info">
+          <div class="prize-name">Gafas de Sol GLO</div>
+          <div class="prize-req">Requiere 4 unidades</div>
+        </div>
+        <div class="prize-status" id="prize-status-3">🔒</div>
+      </div>
+
+      <div class="prize-card" id="prize-4">
+        <div class="prize-icon">🩴</div>
+        <div class="prize-info">
+          <div class="prize-name">Chanclas GLO</div>
+          <div class="prize-req">Requiere 5 unidades</div>
+        </div>
+        <div class="prize-status" id="prize-status-4">🔒</div>
+      </div>
+    </div>
+
+    <!-- Choice for 5+ -->
+    <div class="choice-section" id="choice-section">
+      <div class="choice-title">🎁 ¡CON 5+ UNIDADES ELIGES TÚ!</div>
+      <button class="choice-btn" onclick="selectPrize('boligrafo', this)"><span>✍️</span> Bolígrafo GLO</button>
+      <button class="choice-btn" onclick="selectPrize('totebag', this)"><span>👜</span> Tote Bag GLO</button>
+      <button class="choice-btn" onclick="selectPrize('gafas', this)"><span>🕶️</span> Gafas de Sol GLO</button>
+      <button class="choice-btn" onclick="selectPrize('chanclas', this)"><span>🩴</span> Chanclas GLO</button>
+    </div>
+
+    <button class="btn-confirm" id="btn-confirm" onclick="confirmPrize()" disabled>
+      RECLAMAR MI REGALO
+    </button>
+  </div>
+
+  <div class="passport-footer">
+    <div class="footer-line">PGLOSUMMERCLUB2026 &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+    <div class="footer-line">PASAPORTE DIGITAL · SOLO ADULTOS · VÁLIDO 2026</div>
+    <div class="footer-note">Promoción válida hasta fin de existencias. Solo para usuarios adultos registrados. GLO Summer Club 2026.</div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-icon" id="modal-icon">🎉</div>
+    <div class="modal-title" id="modal-title">¡REGALO DESBLOQUEADO!</div>
+    <div class="modal-body" id="modal-body"></div>
+    <button class="modal-close" onclick="document.getElementById('modal').classList.remove('show')">CONTINUAR</button>
+  </div>
+</div>
+
+<script>
+  // ── CONFIG ──
+  const SUPA_URL = 'https://qrnyvsulckvewabkzjsq.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFybnl2c3VsY2t2ZXdhYmt6anNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MDk3OTYsImV4cCI6MjA5NTk4NTc5Nn0.UxNW8-NmTdmTMSnd2jIKP--F9JMARs4DOJabt2jM1F4';
+  const CLAUDE_API = 'https://api.anthropic.com/v1/messages';
+
+  const PRIZES = [
+    { id: 'boligrafo', icon: '✍️', name: 'Bolígrafo GLO', min: 2 },
+    { id: 'totebag',   icon: '👜', name: 'Tote Bag GLO',   min: 3 },
+    { id: 'gafas',     icon: '🕶️', name: 'Gafas de Sol GLO', min: 4 },
+    { id: 'chanclas',  icon: '🩴', name: 'Chanclas GLO',   min: 5 },
+  ];
+
+  let userEmail = '';
+  let ticketBase64 = '';
+  let ticketMime = 'image/jpeg';
+  let detectedQty = 0;
+  let analysisText = '';
+  let chosenPrize = null;
+  let supabaseId = null;
+
+  // ── LOGIN ──
+  async function doLogin() {
+    const email = document.getElementById('login-email').value.trim().toLowerCase();
+    const errEl = document.getElementById('login-error');
+    const btn = document.getElementById('login-btn');
+    errEl.style.display = 'none';
+    if (!email || !email.includes('@')) { errEl.style.display = 'block'; return; }
+    userEmail = email;
+    btn.disabled = true; btn.textContent = 'BUSCANDO...';
+    try {
+      const res = await fetch(`${SUPA_URL}/rest/v1/registros?email=eq.${encodeURIComponent(email)}&limit=1&select=id,regalo_elegido,unidades_detectadas`, {
+        mode: 'cors',
+        headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}` }
+      });
+      const data = await res.json();
+      if (data && data.length > 0 && data[0].regalo_elegido) {
+        const r = data[0];
+        supabaseId = r.id;
+        showAlreadyClaimed(r);
+        return;
+      }
+    } catch(e) { /* allow in anyway */ }
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('passport').style.display = 'block';
+    btn.disabled = false; btn.textContent = 'ACCEDER';
+  }
+
+  function showAlreadyClaimed(r) {
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('passport').style.display = 'block';
+    // Show result directly
+    document.getElementById('upload-section').style.display = 'none';
+    const p = PRIZES.find(x => x.id === r.regalo_elegido) || {};
+    showModal('✅', '¡YA TIENES TU REGALO!',
+      `Con <strong>${r.unidades_detectadas} unidades GLO</strong> ya reclamaste: <strong>${p.icon || ''} ${p.name || r.regalo_elegido}</strong><br><br>Recógelo en el punto de entrega designado.`);
+  }
+
+  // ── TICKET UPLOAD ──
+  function handleTicketUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+    ticketMime = file.type || 'image/jpeg';
+    const lbl = document.getElementById('ticket-label');
+    lbl.classList.add('has-file');
+    document.getElementById('t-icon').textContent = '✅';
+    document.getElementById('t-main').textContent = file.name.length > 30 ? file.name.slice(0,30)+'…' : file.name;
+    document.getElementById('t-sub').textContent = (file.size/1024).toFixed(0) + ' KB · listo para analizar';
+    const reader = new FileReader();
+    reader.onload = e => {
+      const dataUrl = e.target.result;
+      ticketBase64 = dataUrl.split(',')[1];
+      const preview = document.getElementById('ticket-preview');
+      preview.src = dataUrl; preview.style.display = 'block';
+      document.getElementById('btn-analizar').disabled = false;
+      hideError();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // ── ANALYZE WITH CLAUDE ──
+  async function analyzeTicket() {
+    if (!ticketBase64) return;
+    document.getElementById('btn-analizar').disabled = true;
+    document.getElementById('analyzing-overlay').classList.add('show');
+    hideError();
+
+    try {
+      const res = await fetch('/.netlify/functions/analyze-ticket', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          messages: [{
+            role: 'user',
+            content: [
+              {
+                type: 'image',
+                source: { type: 'base64', media_type: ticketMime, data: ticketBase64 }
+              },
+              {
+                type: 'text',
+                text: `Analiza este ticket de compra y busca productos GLO (cigarrillos de tabaco calentado, dispositivos GLO, consumibles GLO, sticks, neostiks o similares de la marca GLO).
+
+Responde SOLO en este formato JSON exacto, sin texto adicional:
+{
+  "es_ticket": true/false,
+  "contiene_glo": true/false,
+  "cantidad": número_entero,
+  "productos_detectados": "descripción breve de qué productos GLO se ven",
+  "confianza": "alta/media/baja",
+  "nota": "observación breve si hay algo relevante"
+}
+
+Si no es un ticket, pon es_ticket: false y cantidad: 0.
+Si es ticket pero no tiene productos GLO, pon contiene_glo: false y cantidad: 0.
+Cuenta UNIDADES individuales (cajetillas/packs), no el precio ni el importe.`
+              }
+            ]
+          }]
+        })
+      });
+
+      const data = await res.json();
+      document.getElementById('analyzing-overlay').classList.remove('show');
+
+      if (!res.ok) {
+        showError('Error al analizar el ticket. Por favor inténtalo de nuevo.');
+        document.getElementById('btn-analizar').disabled = false;
+        return;
+      }
+
+      const text = data.content.map(c => c.text || '').join('');
+      let parsed;
+      try {
+        const clean = text.replace(/```json|```/g, '').trim();
+        parsed = JSON.parse(clean);
+      } catch(e) {
+        showError('No se pudo leer el ticket. Asegúrate de que la imagen sea clara y legible.');
+        document.getElementById('btn-analizar').disabled = false;
+        return;
+      }
+
+      analysisText = parsed.productos_detectados || '';
+      processResult(parsed);
+
+    } catch(e) {
+      document.getElementById('analyzing-overlay').classList.remove('show');
+      showError('Error de conexión. Comprueba tu internet e inténtalo de nuevo.');
+      document.getElementById('btn-analizar').disabled = false;
+    }
+  }
+
+  function processResult(parsed) {
+    if (!parsed.es_ticket) {
+      showError('La imagen no parece ser un ticket de compra. Por favor sube una foto clara de tu ticket.');
+      document.getElementById('btn-analizar').disabled = false;
+      return;
+    }
+    if (!parsed.contiene_glo || parsed.cantidad === 0) {
+      showError('No hemos detectado productos GLO en este ticket. Asegúrate de que el ticket incluya productos GLO y que la foto sea legible.');
+      document.getElementById('btn-analizar').disabled = false;
+      return;
+    }
+
+    detectedQty = parseInt(parsed.cantidad) || 0;
+
+    // Show result section
+    document.getElementById('upload-section').style.display = 'none';
+    const resultSection = document.getElementById('result-section');
+    resultSection.classList.add('show');
+
+    // Quantity badge
+    document.getElementById('qty-num').textContent = detectedQty;
+    document.getElementById('qty-product').textContent = parsed.productos_detectados || '';
+
+    // Analysis detail
+    let detail = `🔍 Análisis: ${parsed.productos_detectados || 'Productos GLO detectados'}`;
+    if (parsed.nota) detail += ` · ${parsed.nota}`;
+    detail += ` · Confianza: ${parsed.confianza || 'media'}`;
+    document.getElementById('analysis-detail').textContent = detail;
+
+    // Prize cards
+    PRIZES.forEach((p, i) => {
+      const card = document.getElementById('prize-' + (i+1));
+      const status = document.getElementById('prize-status-' + (i+1));
+      if (detectedQty >= p.min) {
+        card.classList.add('unlocked');
+        status.textContent = '✅';
+      } else {
+        card.classList.add('locked');
+        status.textContent = '🔒';
+      }
+    });
+
+    // If 5+ show choice
+    if (detectedQty >= 5) {
+      document.getElementById('choice-section').classList.add('show');
+    } else if (detectedQty >= 2) {
+      // Auto-select highest unlocked prize
+      const highest = PRIZES.filter(p => detectedQty >= p.min).pop();
+      if (highest) {
+        chosenPrize = highest;
+        document.getElementById('btn-confirm').disabled = false;
+      }
+    } else {
+      // Less than 2 - not enough
+      showModal('😔', 'AÚN NO ALCANZAS',
+        `Has comprado <strong>${detectedQty} unidad</strong>. Necesitas al menos <strong>2 unidades GLO</strong> para desbloquear el primer regalo. ¡Sigue comprando!`);
+      document.getElementById('btn-confirm').style.display = 'none';
+    }
+
+    spawnConfetti();
+  }
+
+  function selectPrize(id, btn) {
+    chosenPrize = PRIZES.find(p => p.id === id);
+    document.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('chosen'));
+    btn.classList.add('chosen');
+    // Highlight selected prize card
+    document.querySelectorAll('.prize-card').forEach(c => c.classList.remove('selected-prize'));
+    const idx = PRIZES.findIndex(p => p.id === id);
+    if (idx >= 0) document.getElementById('prize-' + (idx+1)).classList.add('selected-prize');
+    document.getElementById('btn-confirm').disabled = false;
+  }
+
+  async function confirmPrize() {
+    if (!chosenPrize) return;
+    const btn = document.getElementById('btn-confirm');
+    btn.disabled = true; btn.textContent = 'GUARDANDO...';
+
+    // Save to Supabase
+    try {
+      const payload = {
+        email: userEmail,
+        unidades_detectadas: detectedQty,
+        productos_detectados: analysisText,
+        regalo_elegido: chosenPrize.id,
+        regalo_nombre: chosenPrize.name,
+        ticket_img: ticketBase64 ? ticketBase64.slice(0, 50000) : null // limit size
+      };
+
+      let url = `${SUPA_URL}/rest/v1/registros`;
+      let method = 'POST';
+      if (supabaseId) { url += `?id=eq.${supabaseId}`; method = 'PATCH'; }
+
+      const res = await fetch(url, {
+        method, mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: SUPA_KEY,
+          Authorization: `Bearer ${SUPA_KEY}`,
+          Prefer: 'return=representation',
+          'X-Client-Info': 'glo-passport'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        const d = await res.json();
+        if (method === 'POST' && d && d[0]) supabaseId = d[0].id;
+      }
+    } catch(e) { console.error('Supabase save error:', e); }
+
+    showModal('🎉', '¡REGALO DESBLOQUEADO!',
+      `Has desbloqueado: <strong>${chosenPrize.icon} ${chosenPrize.name}</strong><br><br>Recoge tu regalo en el punto de entrega designado. El equipo GLO verificará tu compra.`);
+
+    btn.textContent = '✅ REGALO RECLAMADO';
+    spawnConfetti();
+  }
+
+  // ── HELPERS ──
+  function showError(msg) {
+    const el = document.getElementById('error-box');
+    el.textContent = msg; el.classList.add('show');
+  }
+  function hideError() { document.getElementById('error-box').classList.remove('show'); }
+
+  function showModal(icon, title, body) {
+    document.getElementById('modal-icon').textContent = icon;
+    document.getElementById('modal-title').textContent = title;
+    document.getElementById('modal-body').innerHTML = body;
+    document.getElementById('modal').classList.add('show');
+  }
+
+  function spawnConfetti() {
+    const colors = ['#D4A843','#E8522A','#1A6B6B','#FAF5E8','#2E7D32'];
+    for (let i = 0; i < 60; i++) {
+      const c = document.createElement('div');
+      c.className = 'confetti-piece';
+      c.style.cssText = `left:${Math.random()*100}vw;top:-10px;background:${colors[Math.floor(Math.random()*colors.length)]};width:${Math.random()*8+4}px;height:${Math.random()*8+4}px;animation-duration:${Math.random()*2+1.5}s;animation-delay:${Math.random()*0.5}s;border-radius:${Math.random()>.5?'50%':'2px'}`;
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 4000);
+    }
+  }
+</script>
+</body>
+</html>
