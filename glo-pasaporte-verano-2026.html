@@ -568,7 +568,7 @@ Cuenta UNIDADES individuales (cajetillas/packs), no el precio ni el importe.`
 
     } catch(e) {
       document.getElementById('analyzing-overlay').classList.remove('show');
-      showError('Error de conexión. Comprueba tu internet e inténtalo de nuevo.');
+      showError('Error: ' + e.message + ' | ' + e.name);
       document.getElementById('btn-analizar').disabled = false;
     }
   }
