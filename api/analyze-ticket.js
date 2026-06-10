@@ -24,7 +24,17 @@ export default async function handler(req, res) {
           role: 'user',
           content: [
             { type: 'image', source: { type: 'base64', media_type: imageMime || 'image/jpeg', data: imageBase64 } },
-            { type: 'text', text: 'Analiza este ticket de compra y busca productos GLO (tabaco calentado, dispositivos GLO, sticks, neostiks). Responde SOLO este JSON sin markdown: {"es_ticket":true,"contiene_glo":true,"cantidad":1,"productos_detectados":"descripcion","confianza":"alta","nota":""}' }
+            { type: 'text', text: `Analiza este ticket de compra. Busca productos de la marca GLO o relacionados: GLO, Neo, Neostik, Neo Classic, Neo Sticks, cartones Neo, sticks de tabaco calentado, dispositivos GLO Hyper, GLO Pro, GLO Sens, o cualquier producto Neo/GLO de tabaco calentado.
+
+Es un ticket valido si ves cualquier factura, recibo o comprobante de compra.
+
+Responde SOLO este JSON exacto sin ningun texto adicional ni markdown:
+{"es_ticket":true,"contiene_glo":true,"cantidad":1,"productos_detectados":"descripcion breve","confianza":"alta","nota":""}
+
+Si no es ticket: {"es_ticket":false,"contiene_glo":false,"cantidad":0,"productos_detectados":"","confianza":"alta","nota":"no es ticket"}
+Si es ticket sin productos GLO/Neo: {"es_ticket":true,"contiene_glo":false,"cantidad":0,"productos_detectados":"otros productos","confianza":"alta","nota":"sin productos GLO"}
+
+IMPORTANTE: Neo Classic, Neo Sticks, cartones Neo, son productos GLO. Cuenta las UNIDADES (no el precio).` }
           ]
         }]
       })
