@@ -113,9 +113,9 @@
     <div class="sidebar-item active" onclick="showAll(this)"><span>📋</span> Todos<span class="sidebar-badge" id="sb-total">0</span></div>
     <div class="sidebar-label">Por regalo</div>
     <div class="sidebar-item" onclick="filterByPrize('boligrafo',this)"><span>✍️</span> Bolígrafo<span class="sidebar-badge" id="sb-b">0</span></div>
-    <div class="sidebar-item" onclick="filterByPrize('totebag',this)"><span>👜</span> Tote Bag<span class="sidebar-badge" id="sb-t">0</span></div>
-    <div class="sidebar-item" onclick="filterByPrize('gafas',this)"><span>🕶️</span> Gafas Sol<span class="sidebar-badge" id="sb-g">0</span></div>
-    <div class="sidebar-item" onclick="filterByPrize('chanclas',this)"><span>🩴</span> Chanclas<span class="sidebar-badge" id="sb-c">0</span></div>
+    <div class="sidebar-item" onclick="filterByPrize('vela',this)"><span>🕯️</span> Vela<span class="sidebar-badge" id="sb-t">0</span></div>
+    <div class="sidebar-item" onclick="filterByPrize('sacacorchos',this)"><span>🍾</span> Sacacorchos<span class="sidebar-badge" id="sb-g">0</span></div>
+    <div class="sidebar-item" onclick="filterByPrize('gafas',this)"><span>🕶️</span> Gafas Sol<span class="sidebar-badge" id="sb-c">0</span></div>
     <div class="sidebar-label">Acciones</div>
     <div class="sidebar-item" onclick="exportCSV()"><span>📊</span> Exportar CSV</div>
   </div>
@@ -130,9 +130,9 @@
 
     <div class="prizes-grid">
       <div class="prize-stat"><div class="prize-stat-icon">✍️</div><div class="prize-stat-num" id="ps-b">0</div><div class="prize-stat-name">Bolígrafos</div></div>
-      <div class="prize-stat"><div class="prize-stat-icon">👜</div><div class="prize-stat-num" id="ps-t">0</div><div class="prize-stat-name">Tote Bags</div></div>
-      <div class="prize-stat"><div class="prize-stat-icon">🕶️</div><div class="prize-stat-num" id="ps-g">0</div><div class="prize-stat-name">Gafas Sol</div></div>
-      <div class="prize-stat"><div class="prize-stat-icon">🩴</div><div class="prize-stat-num" id="ps-c">0</div><div class="prize-stat-name">Chanclas</div></div>
+      <div class="prize-stat"><div class="prize-stat-icon">🕯️</div><div class="prize-stat-num" id="ps-t">0</div><div class="prize-stat-name">Velas</div></div>
+      <div class="prize-stat"><div class="prize-stat-icon">🍾</div><div class="prize-stat-num" id="ps-g">0</div><div class="prize-stat-name">Sacacorchos</div></div>
+      <div class="prize-stat"><div class="prize-stat-icon">🕶️</div><div class="prize-stat-num" id="ps-c">0</div><div class="prize-stat-name">Gafas Sol</div></div>
     </div>
 
     <div class="table-wrap">
@@ -167,7 +167,7 @@
   const SUPA_URL = 'https://qrnyvsulckvewabkzjsq.supabase.co';
   const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFybnl2c3VsY2t2ZXdhYmt6anNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MDk3OTYsImV4cCI6MjA5NTk4NTc5Nn0.UxNW8-NmTdmTMSnd2jIKP--F9JMARs4DOJabt2jM1F4';
 
-  const PRIZE_LABELS = { boligrafo:'✍️ Bolígrafo', totebag:'👜 Tote Bag', gafas:'🕶️ Gafas Sol', chanclas:'🩴 Chanclas' };
+  const PRIZE_LABELS = { boligrafo:'✍️ Bolígrafo', vela:'🕯️ Vela', sacacorchos:'🍾 Sacacorchos', gafas:'🕶️ Gafas Sol' };
 
   let allData = [];
   let filterQ = '';
@@ -206,7 +206,7 @@
     document.getElementById('stat-reclamados').textContent = reclamados;
     document.getElementById('stat-avg').textContent = avg;
     document.getElementById('stat-total-uni').textContent = totalUni;
-    const counts = { boligrafo:0, totebag:0, gafas:0, chanclas:0 };
+    const counts = { boligrafo:0, vela:0, sacacorchos:0, gafas:0 };
     allData.forEach(r => { if(r.regalo_elegido && counts[r.regalo_elegido] !== undefined) counts[r.regalo_elegido]++; });
     document.getElementById('ps-b').textContent = counts.boligrafo;
     document.getElementById('ps-t').textContent = counts.totebag;
@@ -216,7 +216,7 @@
 
   function updateSidebar() {
     document.getElementById('sb-total').textContent = allData.length;
-    const counts = { boligrafo:0, totebag:0, gafas:0, chanclas:0 };
+    const counts = { boligrafo:0, vela:0, sacacorchos:0, gafas:0 };
     allData.forEach(r => { if(r.regalo_elegido && counts[r.regalo_elegido] !== undefined) counts[r.regalo_elegido]++; });
     document.getElementById('sb-b').textContent = counts.boligrafo;
     document.getElementById('sb-t').textContent = counts.totebag;
