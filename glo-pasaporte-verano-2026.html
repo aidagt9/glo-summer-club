@@ -191,36 +191,30 @@
       <div class="quantity-label">Unidades compradas</div>
     </div>
 
-    <div class="prizes-title">TU COLECCIÓN SUMMER ESSENTIALS</div>
+    <div class="prizes-title" id="prizes-title">TU REGALO DESBLOQUEADO</div>
 
     <div class="prize-card" id="prize-1">
       <div class="prize-icon">✍️</div>
-      <div class="prize-info"><div class="prize-name">Bolígrafo</div><div class="prize-req">Requiere 1 unidad</div></div>
+      <div class="prize-info"><div class="prize-name">Bolígrafo</div><div class="prize-req">Requiere 2 cajetillas</div></div>
       <div class="prize-status" id="prize-status-1">🔒</div>
     </div>
     <div class="prize-card" id="prize-2">
-      <div class="prize-icon">🕯️</div>
-      <div class="prize-info"><div class="prize-name">Vela</div><div class="prize-req">Requiere 2 unidades</div></div>
+      <div class="prize-icon">🔑</div>
+      <div class="prize-info"><div class="prize-name">Llavero</div><div class="prize-req">Requiere 3 cajetillas</div></div>
       <div class="prize-status" id="prize-status-2">🔒</div>
     </div>
     <div class="prize-card" id="prize-3">
       <div class="prize-icon">🍾</div>
-      <div class="prize-info"><div class="prize-name">Sacacorchos</div><div class="prize-req">Requiere 3 unidades</div></div>
+      <div class="prize-info"><div class="prize-name">Sacacorchos</div><div class="prize-req">Requiere 4 cajetillas</div></div>
       <div class="prize-status" id="prize-status-3">🔒</div>
     </div>
     <div class="prize-card" id="prize-4">
-      <div class="prize-icon">🕶️</div>
-      <div class="prize-info"><div class="prize-name">Gafas de Sol</div><div class="prize-req">Requiere 4 unidades</div></div>
+      <div class="prize-icon">🕯️</div>
+      <div class="prize-info"><div class="prize-name">Vela</div><div class="prize-req">Requiere 5+ cajetillas</div></div>
       <div class="prize-status" id="prize-status-4">🔒</div>
     </div>
 
-    <div class="choice-section" id="choice-section">
-      <div class="choice-title">🎁 ¡CON 5+ UNIDADES ELIGES TÚ!</div>
-      <button class="choice-btn" onclick="selectPrize('boligrafo', this)"><span>✍️</span> Bolígrafo</button>
-      <button class="choice-btn" onclick="selectPrize('vela', this)"><span>🕯️</span> Vela</button>
-      <button class="choice-btn" onclick="selectPrize('sacacorchos', this)"><span>🍾</span> Sacacorchos</button>
-      <button class="choice-btn" onclick="selectPrize('gafas', this)"><span>🕶️</span> Gafas de Sol</button>
-    </div>
+    <div class="choice-section" id="choice-section"></div>
 
     <button class="btn-confirm" id="btn-confirm" onclick="confirmPrize()" disabled>RECLAMAR MI REGALO</button>
   </div>
@@ -246,10 +240,10 @@
   const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFybnl2c3VsY2t2ZXdhYmt6anNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MDk3OTYsImV4cCI6MjA5NTk4NTc5Nn0.UxNW8-NmTdmTMSnd2jIKP--F9JMARs4DOJabt2jM1F4';
 
   const PRIZES = [
-    { id: 'boligrafo', icon: '✍️', name: 'Bolígrafo', min: 1 },
-    { id: 'vela',      icon: '🕯️', name: 'Vela',       min: 2 },
-    { id: 'sacacorchos', icon: '🍾', name: 'Sacacorchos', min: 3 },
-    { id: 'gafas',     icon: '🕶️', name: 'Gafas de Sol', min: 4 },
+    { id: 'boligrafo',   icon: '✍️', name: 'Bolígrafo',   min: 2 },
+    { id: 'llavero',     icon: '🔑', name: 'Llavero',      min: 3 },
+    { id: 'sacacorchos', icon: '🍾', name: 'Sacacorchos',  min: 4 },
+    { id: 'vela',        icon: '🕯️', name: 'Vela',         min: 5 },
   ];
 
   let userEmail = '';
@@ -334,25 +328,23 @@
     resultSection.classList.add('show');
     document.getElementById('qty-num').textContent = selectedQty;
 
-    PRIZES.forEach((p, i) => {
-      const card = document.getElementById('prize-' + (i+1));
-      const status = document.getElementById('prize-status-' + (i+1));
-      if (selectedQty >= p.min) {
-        card.classList.add('unlocked');
-        status.textContent = '✅';
-      } else {
-        card.classList.add('locked');
-        status.textContent = '🔒';
-      }
-    });
-
-    if (selectedQty >= 5) {
-      document.getElementById('choice-section').classList.add('show');
-    } else if (selectedQty >= 1) {
+    if (selectedQty >= 1) {
+      // Determinar el regalo ganado (el máximo que puede desbloquear)
       chosenPrize = PRIZES.filter(p => selectedQty >= p.min).pop();
+      // Mostrar solo la tarjeta del regalo ganado, ocultar el resto
+      PRIZES.forEach((p, i) => {
+        const card = document.getElementById('prize-' + (i+1));
+        if (p.id === chosenPrize.id) {
+          card.classList.add('unlocked');
+          document.getElementById('prize-status-' + (i+1)).textContent = '✅';
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
       document.getElementById('btn-confirm').disabled = false;
     } else {
-      showModal('😔', 'AÚN NO ALCANZAS', `Necesitas al menos <strong>1 unidad</strong> para desbloquear el primer regalo. ¡Sigue comprando!`);
+      showModal('😔', 'AÚN NO ALCANZAS', `Necesitas al menos <strong>2 cajetillas</strong> para desbloquear el primer regalo. ¡Sigue comprando!`);
       document.getElementById('btn-confirm').style.display = 'none';
     }
     spawnConfetti();
