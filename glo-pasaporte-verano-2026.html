@@ -132,23 +132,8 @@
 </head>
 <body>
 
-<!-- LOGIN -->
-<div class="login-screen" id="login-screen">
-  <div class="login-sun">☀️</div>
-  <div class="login-brand">NEO · VEO</div>
-  <div class="login-title">PASAPORTE<br>DE VERANO</div>
-  <div class="login-year">2 0 2 6</div>
-  <div class="login-box">
-    <div class="login-error" id="login-error">Introduce un email válido.</div>
-    <label class="login-label">Tu correo electrónico</label>
-    <input class="login-input" type="email" id="login-email" placeholder="correo@ejemplo.com" onkeydown="if(event.key==='Enter') doLogin()">
-    <button class="login-btn" id="login-btn" onclick="doLogin()">ACCEDER</button>
-    <div class="login-msg">Solo necesitas tu email y la foto de tu ticket de compra.</div>
-  </div>
-</div>
-
 <!-- PASSPORT -->
-<div class="passport" id="passport" style="display:none">
+<div class="passport" id="passport">
   <div class="cover">
     <div class="cover-sun">☀️</div>
     <div class="cover-brand">NEO · VEO</div>
@@ -199,8 +184,8 @@
       <div class="prize-status" id="prize-status-1">🔒</div>
     </div>
     <div class="prize-card" id="prize-2">
-      <div class="prize-icon">🔑</div>
-      <div class="prize-info"><div class="prize-name">Llavero</div><div class="prize-req">Requiere 3 cajetillas</div></div>
+      <div class="prize-icon">🎵</div>
+      <div class="prize-info"><div class="prize-name">Silbato</div><div class="prize-req">Requiere 3 cajetillas</div></div>
       <div class="prize-status" id="prize-status-2">🔒</div>
     </div>
     <div class="prize-card" id="prize-3">
@@ -241,44 +226,15 @@
 
   const PRIZES = [
     { id: 'boligrafo',   icon: '✍️', name: 'Bolígrafo',   min: 2 },
-    { id: 'llavero',     icon: '🔑', name: 'Llavero',      min: 3 },
+    { id: 'silbato',     icon: '🎵', name: 'Silbato',       min: 3 },
     { id: 'sacacorchos', icon: '🍾', name: 'Sacacorchos',  min: 4 },
     { id: 'vela',        icon: '🕯️', name: 'Vela',         min: 5 },
   ];
 
-  let userEmail = '';
   let ticketBase64 = '';
   let selectedQty = 0;
   let chosenPrize = null;
   let supabaseId = null;
-
-  async function doLogin() {
-    const email = document.getElementById('login-email').value.trim().toLowerCase();
-    const errEl = document.getElementById('login-error');
-    const btn = document.getElementById('login-btn');
-    errEl.style.display = 'none';
-    if (!email || !email.includes('@')) { errEl.style.display = 'block'; return; }
-    userEmail = email;
-    btn.disabled = true; btn.textContent = 'BUSCANDO...';
-    try {
-      const res = await fetch(`${SUPA_URL}/rest/v1/registros?email=eq.${encodeURIComponent(email)}&limit=1&select=id,regalo_elegido,unidades_detectadas`, {
-        mode: 'cors', headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}` }
-      });
-      const data = await res.json();
-      if (data && data.length > 0 && data[0].regalo_elegido) {
-        const r = data[0];
-        supabaseId = r.id;
-        const p = PRIZES.find(x => x.id === r.regalo_elegido) || {};
-        document.getElementById('login-screen').classList.add('hidden');
-        document.getElementById('passport').style.display = 'block';
-        showModal('✅', '¡YA TIENES TU REGALO!', `Con <strong>${r.unidades_detectadas} unidades GLO</strong> ya reclamaste: <strong>${p.icon || ''} ${p.name || r.regalo_elegido}</strong><br><br>Recógelo en el punto de entrega designado.`);
-        return;
-      }
-    } catch(e) { /* allow in anyway */ }
-    document.getElementById('login-screen').classList.add('hidden');
-    document.getElementById('passport').style.display = 'block';
-    btn.disabled = false; btn.textContent = 'ACCEDER';
-  }
 
   function handleTicketUpload(input) {
     const file = input.files[0];
@@ -365,7 +321,7 @@
     const btn = document.getElementById('btn-confirm');
     btn.disabled = true; btn.textContent = 'GUARDANDO...';
     try {
-      const payload = { email: userEmail, unidades_detectadas: selectedQty, regalo_elegido: chosenPrize.id, regalo_nombre: chosenPrize.name, ticket_img: ticketBase64 ? ticketBase64.slice(0, 50000) : null };
+      const payload = { unidades_detectadas: selectedQty, regalo_elegido: chosenPrize.id, regalo_nombre: chosenPrize.name, ticket_img: ticketBase64 ? ticketBase64.slice(0, 50000) : null };
       let url = `${SUPA_URL}/rest/v1/registros`;
       let method = 'POST';
       if (supabaseId) { url += `?id=eq.${supabaseId}`; method = 'PATCH'; }
