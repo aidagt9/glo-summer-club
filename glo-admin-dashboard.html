@@ -89,6 +89,8 @@
   .lightbox.open { display:flex; }
   .lightbox img { max-width:90vw; max-height:88vh; border-radius:6px; object-fit:contain; }
   .lightbox-close { position:fixed; top:20px; right:24px; background:rgba(255,255,255,0.1); border:none; color:white; font-size:22px; width:40px; height:40px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .load-error { margin:16px 28px 0; padding:12px 16px; border:1px solid var(--coral); background:rgba(232,82,42,0.08); color:var(--coral); border-radius:6px; font-size:12px; display:none; }
+  .load-error.show { display:block; }
   @media (max-width:900px) { .stats-grid,.prizes-grid { grid-template-columns:repeat(2,1fr); } .sidebar { display:none; } .detail-panel { width:100%; } }
 </style>
 </head>
@@ -107,15 +109,17 @@
   </div>
 </div>
 
+<div class="load-error" id="load-error">⚠ No se pudo cargar el Google Sheet. Comprueba que el endpoint de SheetDB es correcto y que la hoja sigue accesible.</div>
+
 <div class="layout">
   <div class="sidebar">
     <div class="sidebar-label">General</div>
     <div class="sidebar-item active" onclick="showAll(this)"><span>📋</span> Todos<span class="sidebar-badge" id="sb-total">0</span></div>
     <div class="sidebar-label">Por regalo</div>
     <div class="sidebar-item" onclick="filterByPrize('boligrafo',this)"><span>✍️</span> Bolígrafo<span class="sidebar-badge" id="sb-b">0</span></div>
-    <div class="sidebar-item" onclick="filterByPrize('vela',this)"><span>🕯️</span> Vela<span class="sidebar-badge" id="sb-t">0</span></div>
-    <div class="sidebar-item" onclick="filterByPrize('sacacorchos',this)"><span>🍾</span> Sacacorchos<span class="sidebar-badge" id="sb-g">0</span></div>
-    <div class="sidebar-item" onclick="filterByPrize('gafas',this)"><span>🕶️</span> Gafas Sol<span class="sidebar-badge" id="sb-c">0</span></div>
+    <div class="sidebar-item" onclick="filterByPrize('silbato',this)"><span>🎺</span> Silbato<span class="sidebar-badge" id="sb-s">0</span></div>
+    <div class="sidebar-item" onclick="filterByPrize('sacacorchos',this)"><span>🍾</span> Sacacorchos<span class="sidebar-badge" id="sb-c">0</span></div>
+    <div class="sidebar-item" onclick="filterByPrize('vela',this)"><span>🕯️</span> Vela<span class="sidebar-badge" id="sb-v">0</span></div>
     <div class="sidebar-label">Acciones</div>
     <div class="sidebar-item" onclick="exportCSV()"><span>📊</span> Exportar CSV</div>
   </div>
@@ -130,9 +134,9 @@
 
     <div class="prizes-grid">
       <div class="prize-stat"><div class="prize-stat-icon">✍️</div><div class="prize-stat-num" id="ps-b">0</div><div class="prize-stat-name">Bolígrafos</div></div>
-      <div class="prize-stat"><div class="prize-stat-icon">🕯️</div><div class="prize-stat-num" id="ps-t">0</div><div class="prize-stat-name">Velas</div></div>
-      <div class="prize-stat"><div class="prize-stat-icon">🍾</div><div class="prize-stat-num" id="ps-g">0</div><div class="prize-stat-name">Sacacorchos</div></div>
-      <div class="prize-stat"><div class="prize-stat-icon">🕶️</div><div class="prize-stat-num" id="ps-c">0</div><div class="prize-stat-name">Gafas Sol</div></div>
+      <div class="prize-stat"><div class="prize-stat-icon">🎺</div><div class="prize-stat-num" id="ps-s">0</div><div class="prize-stat-name">Silbatos</div></div>
+      <div class="prize-stat"><div class="prize-stat-icon">🍾</div><div class="prize-stat-num" id="ps-c">0</div><div class="prize-stat-name">Sacacorchos</div></div>
+      <div class="prize-stat"><div class="prize-stat-icon">🕯️</div><div class="prize-stat-num" id="ps-v">0</div><div class="prize-stat-name">Velas</div></div>
     </div>
 
     <div class="table-wrap">
@@ -164,23 +168,47 @@
 </div>
 
 <script>
-  const SUPA_URL = 'https://qrnyvsulckvewabkzjsq.supabase.co';
-  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFybnl2c3VsY2t2ZXdhYmt6anNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MDk3OTYsImV4cCI6MjA5NTk4NTc5Nn0.UxNW8-NmTdmTMSnd2jIKP--F9JMARs4DOJabt2jM1F4';
+  // Endpoint de SheetDB conectado al Google Sheet "GLO PASAPORTE DE VERANO"
+  const SHEETDB_URL = 'https://sheetdb.io/api/v1/yl0c2cy6qonri';
 
-  const PRIZE_LABELS = { boligrafo:'✍️ Bolígrafo', vela:'🕯️ Vela', sacacorchos:'🍾 Sacacorchos', gafas:'🕶️ Gafas Sol' };
+  // Nombres exactos de columnas tal como están en la fila 1 del Sheet
+  const COL = { email:'EMAIL', unidades:'UNIDADES', regalo:'REGALO', ticket:'TICKET URL', fecha:'FECHA' };
+
+  const PRIZE_LABELS = { boligrafo:'✍️ Bolígrafo', silbato:'🎺 Silbato', sacacorchos:'🍾 Sacacorchos', vela:'🕯️ Vela' };
 
   let allData = [];
   let filterQ = '';
   let filterPrize = null;
 
+  function normPrize(v) {
+    return (v||'').toString().trim().toLowerCase();
+  }
+
+  function getDate(r) {
+    const raw = r[COL.fecha];
+    const d = raw ? new Date(raw) : null;
+    return d && !isNaN(d) ? d : null;
+  }
+
   async function loadData() {
+    const errBox = document.getElementById('load-error');
     try {
-      const res = await fetch(`${SUPA_URL}/rest/v1/registros?select=*&order=created_at.desc`, {
-        headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}` }
-      });
-      allData = await res.json();
+      const res = await fetch(SHEETDB_URL);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const raw = await res.json();
+      allData = raw.map(r => ({
+        email: r[COL.email] || '',
+        unidades: parseInt(r[COL.unidades], 10) || 0,
+        regalo: normPrize(r[COL.regalo]),
+        ticket: r[COL.ticket] || '',
+        fecha: r[COL.fecha] || ''
+      })).sort((a,b) => (new Date(b.fecha)) - (new Date(a.fecha)));
+      errBox.classList.remove('show');
       render();
-    } catch(e) { console.error('Error:', e); }
+    } catch(e) {
+      console.error('Error cargando SheetDB:', e);
+      errBox.classList.add('show');
+    }
   }
 
   function render() {
@@ -191,37 +219,41 @@
 
   function filtered() {
     return allData.filter(r => {
-      const okQ = !filterQ || (r.email||'').toLowerCase().includes(filterQ.toLowerCase());
-      const okP = !filterPrize || r.regalo_elegido === filterPrize;
+      const okQ = !filterQ || r.email.toLowerCase().includes(filterQ.toLowerCase());
+      const okP = !filterPrize || r.regalo === filterPrize;
       return okQ && okP;
     });
   }
 
+  function countByPrize() {
+    const counts = { boligrafo:0, silbato:0, sacacorchos:0, vela:0 };
+    allData.forEach(r => { if (r.regalo && counts[r.regalo] !== undefined) counts[r.regalo]++; });
+    return counts;
+  }
+
   function updateStats() {
     const total = allData.length;
-    const reclamados = allData.filter(r => r.regalo_elegido).length;
-    const totalUni = allData.reduce((a,r) => a + (r.unidades_detectadas||0), 0);
+    const reclamados = allData.filter(r => r.regalo).length;
+    const totalUni = allData.reduce((a,r) => a + r.unidades, 0);
     const avg = reclamados ? (totalUni / reclamados).toFixed(1) : '—';
     document.getElementById('stat-total').textContent = total;
     document.getElementById('stat-reclamados').textContent = reclamados;
     document.getElementById('stat-avg').textContent = avg;
     document.getElementById('stat-total-uni').textContent = totalUni;
-    const counts = { boligrafo:0, vela:0, sacacorchos:0, gafas:0 };
-    allData.forEach(r => { if(r.regalo_elegido && counts[r.regalo_elegido] !== undefined) counts[r.regalo_elegido]++; });
+    const counts = countByPrize();
     document.getElementById('ps-b').textContent = counts.boligrafo;
-    document.getElementById('ps-t').textContent = counts.totebag;
-    document.getElementById('ps-g').textContent = counts.gafas;
-    document.getElementById('ps-c').textContent = counts.chanclas;
+    document.getElementById('ps-s').textContent = counts.silbato;
+    document.getElementById('ps-c').textContent = counts.sacacorchos;
+    document.getElementById('ps-v').textContent = counts.vela;
   }
 
   function updateSidebar() {
     document.getElementById('sb-total').textContent = allData.length;
-    const counts = { boligrafo:0, vela:0, sacacorchos:0, gafas:0 };
-    allData.forEach(r => { if(r.regalo_elegido && counts[r.regalo_elegido] !== undefined) counts[r.regalo_elegido]++; });
+    const counts = countByPrize();
     document.getElementById('sb-b').textContent = counts.boligrafo;
-    document.getElementById('sb-t').textContent = counts.totebag;
-    document.getElementById('sb-g').textContent = counts.gafas;
-    document.getElementById('sb-c').textContent = counts.chanclas;
+    document.getElementById('sb-s').textContent = counts.silbato;
+    document.getElementById('sb-c').textContent = counts.sacacorchos;
+    document.getElementById('sb-v').textContent = counts.vela;
   }
 
   function renderTable(data) {
@@ -232,16 +264,17 @@
     }
     const rows = data.map(r => {
       const initials = (r.email||'?')[0].toUpperCase();
-      const date = new Date(r.created_at).toLocaleDateString('es-ES',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
-      const regalo = r.regalo_elegido ? `<span class="regalo-badge">${PRIZE_LABELS[r.regalo_elegido]||r.regalo_elegido}</span>` : `<span style="color:var(--muted);font-size:12px">— Sin reclamar</span>`;
-      const ticket = r.ticket_img ? `<img class="ticket-thumb" src="data:image/jpeg;base64,${r.ticket_img.slice(0,100)}" onclick="event.stopPropagation();openLightbox('data:image/jpeg;base64,${r.ticket_img}')">` : `<div class="no-ticket">—</div>`;
+      const d = getDate(r);
+      const dateStr = d ? d.toLocaleDateString('es-ES',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : (r.fecha||'—');
+      const regalo = r.regalo ? `<span class="regalo-badge">${PRIZE_LABELS[r.regalo]||r.regalo}</span>` : `<span style="color:var(--muted);font-size:12px">— Sin reclamar</span>`;
+      const ticket = r.ticket ? `<img class="ticket-thumb" src="${r.ticket}" onclick="event.stopPropagation();openLightbox('${r.ticket}')">` : `<div class="no-ticket">—</div>`;
       const idx = allData.indexOf(r);
       return `<tr onclick="showDetail(${idx})">
         <td><div class="user-cell"><div class="avatar">${initials}</div><div class="td-email">${r.email||'—'}</div></div></td>
-        <td><div class="qty-badge">${r.unidades_detectadas||0}</div></td>
+        <td><div class="qty-badge">${r.unidades}</div></td>
         <td>${regalo}</td>
         <td>${ticket}</td>
-        <td style="font-size:11px;color:var(--muted)">${date}</td>
+        <td style="font-size:11px;color:var(--muted)">${dateStr}</td>
       </tr>`;
     }).join('');
     c.innerHTML = `<table><thead><tr><th>Email</th><th>Uds.</th><th>Regalo</th><th>Ticket</th><th>Fecha</th></tr></thead><tbody>${rows}</tbody></table>`;
@@ -256,18 +289,21 @@
     if (!r) return;
     document.getElementById('d-avatar').textContent = (r.email||'?')[0].toUpperCase();
     document.getElementById('d-name').textContent = r.email||'—';
-    document.getElementById('d-sub').textContent = r.regalo_elegido ? `Regalo: ${PRIZE_LABELS[r.regalo_elegido]||r.regalo_elegido}` : 'Sin regalo reclamado';
+    document.getElementById('d-sub').textContent = r.regalo ? `Regalo: ${PRIZE_LABELS[r.regalo]||r.regalo}` : 'Sin regalo reclamado';
+
+    const d = getDate(r);
+    const dateStr = d ? d.toLocaleString('es-ES') : (r.fecha||'—');
 
     let html = `<div class="d-section">Datos del registro</div><div class="d-grid">
       <div class="d-field"><div class="d-field-label">Email</div><div class="d-field-value">${r.email||'—'}</div></div>
-      <div class="d-field"><div class="d-field-label">Unidades compradas</div><div class="d-field-value">${r.unidades_detectadas||0}</div></div>
-      <div class="d-field"><div class="d-field-label">Regalo elegido</div><div class="d-field-value">${r.regalo_elegido ? PRIZE_LABELS[r.regalo_elegido] : '— Sin reclamar'}</div></div>
-      <div class="d-field"><div class="d-field-label">Fecha</div><div class="d-field-value" style="font-size:11px">${new Date(r.created_at).toLocaleString('es-ES')}</div></div>
+      <div class="d-field"><div class="d-field-label">Unidades compradas</div><div class="d-field-value">${r.unidades}</div></div>
+      <div class="d-field"><div class="d-field-label">Regalo elegido</div><div class="d-field-value">${r.regalo ? PRIZE_LABELS[r.regalo] : '— Sin reclamar'}</div></div>
+      <div class="d-field"><div class="d-field-label">Fecha</div><div class="d-field-value" style="font-size:11px">${dateStr}</div></div>
     </div>`;
 
-    if (r.ticket_img) {
+    if (r.ticket) {
       html += `<div class="d-section">📸 Foto del ticket</div>
-        <img class="ticket-full" src="data:image/jpeg;base64,${r.ticket_img}" onclick="openLightbox('data:image/jpeg;base64,${r.ticket_img}')" alt="Ticket">`;
+        <img class="ticket-full" src="${r.ticket}" onclick="openLightbox('${r.ticket}')" alt="Ticket">`;
     }
 
     document.getElementById('d-body').innerHTML = html;
@@ -282,7 +318,7 @@
   function exportCSV() {
     if (!allData.length) { alert('No hay datos.'); return; }
     const h = ['Email','Unidades','Regalo','Fecha'];
-    const rows = allData.map(r => [r.email||'',r.unidades_detectadas||0,r.regalo_nombre||r.regalo_elegido||'',new Date(r.created_at).toLocaleString('es-ES')].map(v=>`"${String(v).replace(/"/g,'""')}"`));
+    const rows = allData.map(r => [r.email,r.unidades,r.regalo,r.fecha].map(v=>`"${String(v).replace(/"/g,'""')}"`));
     const csv = [h.join(','),...rows.map(r=>r.join(','))].join('\n');
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
