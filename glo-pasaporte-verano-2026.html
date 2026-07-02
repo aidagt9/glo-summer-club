@@ -221,8 +221,11 @@
 </div>
 
 <script>
-  const SUPA_URL = 'https://qrnyvsulckvewabkzjsq.supabase.co';
-  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFybnl2c3VsY2t2ZXdhYmt6anNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MDk3OTYsImV4cCI6MjA5NTk4NTc5Nn0.UxNW8-NmTdmTMSnd2jIKP--F9JMARs4DOJabt2jM1F4';
+  // Google Sheet "GLO PASAPORTE DE VERANO" vía SheetDB (sustituye a Supabase)
+  const SHEETDB_URL = 'https://sheetdb.io/api/v1/yl0c2cy6qonri';
+
+  // Nombres exactos de columnas en la fila 1 del Sheet
+  const COL = { email:'EMAIL', unidades:'UNIDADES', regalo:'REGALO', ticket:'TICKET URL', fecha:'FECHA' };
 
   const PRIZES = [
     { id: 'boligrafo',   icon: '✍️', name: 'Bolígrafo',   min: 2 },
@@ -234,7 +237,7 @@
   let ticketBase64 = '';
   let selectedQty = 0;
   let chosenPrize = null;
-  let supabaseId = null;
+  let saved = false;
 
   function handleTicketUpload(input) {
     const file = input.files[0];
@@ -257,6 +260,7 @@
         }
         canvas.width = w; canvas.height = h;
         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        // Se guarda solo localmente para la vista previa; no se envía al Sheet.
         ticketBase64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
         const preview = document.getElementById('ticket-preview');
         preview.src = canvas.toDataURL('image/jpeg', 0.8);
@@ -317,16 +321,25 @@
   }
 
   async function confirmPrize() {
-    if (!chosenPrize) return;
+    if (!chosenPrize || saved) return;
     const btn = document.getElementById('btn-confirm');
     btn.disabled = true; btn.textContent = 'GUARDANDO...';
     try {
-      const payload = { unidades_detectadas: selectedQty, regalo_elegido: chosenPrize.id, regalo_nombre: chosenPrize.name, ticket_img: ticketBase64 ? ticketBase64.slice(0, 50000) : null };
-      let url = `${SUPA_URL}/rest/v1/registros`;
-      let method = 'POST';
-      if (supabaseId) { url += `?id=eq.${supabaseId}`; method = 'PATCH'; }
-      const res = await fetch(url, { method, mode: 'cors', headers: { 'Content-Type': 'application/json', apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`, Prefer: 'return=representation', 'X-Client-Info': 'glo-passport' }, body: JSON.stringify(payload) });
-      if (res.ok) { const d = await res.json(); if (method === 'POST' && d && d[0]) supabaseId = d[0].id; }
+      const row = {};
+      row[COL.email] = '';
+      row[COL.unidades] = selectedQty;
+      row[COL.regalo] = chosenPrize.id;
+      row[COL.ticket] = ''; // no se envía la foto del ticket
+      row[COL.fecha] = new Date().toISOString();
+
+      const res = await fetch(SHEETDB_URL, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: [row] })
+      });
+      if (res.ok) saved = true;
+      else console.error('SheetDB respondió con error:', res.status);
     } catch(e) { console.error('Save error:', e); }
     showModal('🎉', '¡REGALO DESBLOQUEADO!', `Has desbloqueado: <strong>${chosenPrize.icon} ${chosenPrize.name}</strong><br><br>Recoge tu regalo en el punto de entrega designado. El equipo GLO verificará tu compra.`);
     btn.textContent = '✅ REGALO RECLAMADO';
